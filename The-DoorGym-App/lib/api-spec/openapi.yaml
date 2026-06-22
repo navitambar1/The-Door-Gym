@@ -1,0 +1,279 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Gym Workout App API - proxies Adalo database
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: workouts
+    description: Workout operations
+  - name: exercises
+    description: Exercise operations
+  - name: categories
+    description: Category operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /workouts:
+    get:
+      operationId: getWorkouts
+      tags: [workouts]
+      summary: List all workouts
+      parameters:
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of workouts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkoutListResponse"
+  /workouts/{id}:
+    get:
+      operationId: getWorkout
+      tags: [workouts]
+      summary: Get workout by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Workout detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workout"
+        "404":
+          description: Not found
+  /exercises:
+    get:
+      operationId: getExercises
+      tags: [exercises]
+      summary: List all exercises
+      parameters:
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: muscleGroup
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of exercises
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExerciseListResponse"
+  /exercises/{id}:
+    get:
+      operationId: getExercise
+      tags: [exercises]
+      summary: Get exercise by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Exercise detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Exercise"
+        "404":
+          description: Not found
+  /categories:
+    get:
+      operationId: getCategories
+      tags: [categories]
+      summary: List all categories
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryListResponse"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    Workout:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+          nullable: true
+        duration:
+          type: integer
+          description: Duration in minutes
+        difficulty:
+          type: string
+          nullable: true
+        category:
+          type: string
+          nullable: true
+        exerciseCount:
+          type: integer
+        calories:
+          type: integer
+          nullable: true
+      required:
+        - id
+        - name
+        - duration
+        - exerciseCount
+    Exercise:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+          nullable: true
+        muscleGroup:
+          type: string
+          nullable: true
+        sets:
+          type: integer
+          nullable: true
+        reps:
+          type: string
+          nullable: true
+        duration:
+          type: integer
+          nullable: true
+        equipment:
+          type: string
+          nullable: true
+        videoUrl:
+          type: string
+          nullable: true
+      required:
+        - id
+        - name
+        - description
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        image:
+          type: string
+          nullable: true
+        workoutCount:
+          type: integer
+          nullable: true
+      required:
+        - id
+        - name
+    WorkoutListResponse:
+      type: object
+      properties:
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/Workout"
+        offset:
+          type: integer
+        nextOffset:
+          type: integer
+          nullable: true
+      required:
+        - records
+        - offset
+    ExerciseListResponse:
+      type: object
+      properties:
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/Exercise"
+        offset:
+          type: integer
+        nextOffset:
+          type: integer
+          nullable: true
+      required:
+        - records
+        - offset
+    CategoryListResponse:
+      type: object
+      properties:
+        records:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+        offset:
+          type: integer
+        nextOffset:
+          type: integer
+          nullable: true
+      required:
+        - records
+        - offset

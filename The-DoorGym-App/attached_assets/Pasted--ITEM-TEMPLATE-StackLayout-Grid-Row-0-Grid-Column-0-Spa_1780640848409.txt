@@ -1,0 +1,78 @@
+<!-- ITEM TEMPLATE -->
+                    <StackLayout Grid.Row="0" Grid.Column="0" Spacing="6">
+                        <ImageButton Source="newinstructions.png"
+                                      Aspect="AspectFit"
+                                     HeightRequest="180"
+                                     BackgroundColor="Transparent"
+                                     Clicked="OnInstructionClicked" />
+                        <Label Text="App Instructions"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               FontAutoScalingEnabled="False"
+                               HorizontalOptions="Center" />
+                    </StackLayout>
+
+                    <StackLayout Grid.Row="0" Grid.Column="1" Spacing="6">
+                        <ImageButton Source="neweducation.jpg"
+                                      Aspect="AspectFit"
+                                     HeightRequest="180"
+                                     BackgroundColor="Transparent"
+                                     Clicked="Education_Clicked" />
+                        <Label Text="Education"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               FontAutoScalingEnabled="False"
+                               HorizontalOptions="Center" />
+                    </StackLayout>
+
+                    <StackLayout Grid.Row="1" Grid.Column="0" Spacing="6">
+                        <ImageButton Source="newexerciselibrary.jpg"
+                                      Aspect="AspectFit"
+                                     HeightRequest="180"
+                                     BackgroundColor="Transparent"
+                                     Clicked="OnexerciselibraryClicked" />
+                        <Label Text="Exercise Library"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               FontAutoScalingEnabled="False"
+                               HorizontalOptions="Center" />
+                    </StackLayout>
+
+                    <StackLayout Grid.Row="1" Grid.Column="1" Spacing="6">
+                        <ImageButton Source="newstartworkout.jpg"
+                                     Aspect="AspectFit"
+                                     HeightRequest="180"
+                                     BackgroundColor="Transparent"
+                                     Clicked="OnStartWorkoutClicked" />
+                        <Label Text="Start Workout"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               FontAutoScalingEnabled="False"
+                               HorizontalOptions="Center" />
+                    </StackLayout>
+
+                    <StackLayout Grid.Row="2" Grid.Column="0" Spacing="6">
+                        <ImageButton Source="doorgymsetup.jpg"
+                                      Aspect="AspectFit"
+                                     HeightRequest="180"
+                                     BackgroundColor="Transparent"
+                                     Clicked="gymsetupclicked" />
+                        <Label Text="Setup Videos"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               FontAutoScalingEnabled="False"
+                               HorizontalOptions="Center" />
+                    </StackLayout>
+
+                    <StackLayout Grid.Row="2" Grid.Column="1" Spacing="6">
+                        <ImageButton Source="shopping.jpg"
+                                      Aspect="AspectFit"
+                                     HeightRequest="180"
+                                     BackgroundColor="Transparent"
+                                     Clicked="OnShopNowClicked" />
+                        <Label Text="Shop Website"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               FontAutoScalingEnabled="False"
+                               HorizontalOptions="Center" />
+                    </StackLayout>

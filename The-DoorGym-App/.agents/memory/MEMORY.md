@@ -1,0 +1,4 @@
+- [Adalo API field names](adalo-field-names.md) — real Adalo fields differ from camelCase guesses; critical mapping for correct data display
+- [Door Gym app architecture](door-gym-architecture.md) — Stack-only nav, WorkoutTypeContext, per-screen Adalo hooks, CDN image helper
+- [In-app video player](video-player.md) — All video playback uses VideoPlayerModal (WebView/YouTube embed), never WebBrowser; install react-native-webview
+- [Exercise grid 2-column](grid-layout.md) — Use useWindowDimensions() hook inside component, never Dimensions.get() at module level; pass cardW as prop
