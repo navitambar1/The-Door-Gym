@@ -18,10 +18,10 @@ import { DrawerMenu } from "@/components/DrawerMenu";
 import { PACKAGES, WorkoutType, useWorkoutType } from "@/context/WorkoutTypeContext";
 
 const PACKAGE_IMAGES: Record<WorkoutType, ImageSourcePropType> = {
-  ES: require("../assets/images/essential1.png") as ImageSourcePropType,
-  "ES+": require("../assets/images/essential_plus.png") as ImageSourcePropType,
-  FF: require("../assets/images/functional1.png") as ImageSourcePropType,
-  "FF+": require("../assets/images/functional_plus.png") as ImageSourcePropType,
+  ES: require("../assets/images/essential1_fixed.png") as ImageSourcePropType,
+  "ES+": require("../assets/images/essential_plus_cleaned.png") as ImageSourcePropType,
+  FF: require("../assets/images/functional1_fixed.png") as ImageSourcePropType,
+  "FF+": require("../assets/images/functional_plus_fixed.png") as ImageSourcePropType,
 };
 
 const PACKAGE_DESCRIPTIONS: { code: WorkoutType; label: string; desc: string }[] = [

@@ -2,22 +2,23 @@ import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { createVideoPlayer, type VideoPlayer } from "expo-video";
 import React, { useEffect, useRef, useState } from "react";
+
 import {
   ActivityIndicator,
   FlatList,
   Pressable,
-  Image,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useVideos, AdaloVideo, adaloImageUrl, adaloVideoUrl } from "@/hooks/useAdaloApi";
+import { useVideos, AdaloVideo, adaloVideoUrl } from "@/hooks/useAdaloApi";
 import { AppHeader } from "@/components/AppHeader";
 import { DrawerMenu } from "@/components/DrawerMenu";
 import { VideoPlayerModal } from "@/components/VideoPlayerModal";
+import { VideoRenderer } from "@/components/VideoRenderer";
 import { COLORS } from "@/constants/colors";
 
 const PRELOAD_AHEAD = 3;
@@ -36,6 +37,7 @@ export default function ExerciseVideoPlayerScreen() {
   const { categoryId, name } = useLocalSearchParams<{ categoryId: string; name?: string }>();
   const router = useRouter();
   const { width: SCREEN_W } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const [menuVisible, setMenuVisible] = useState(false);
   const [videoVisible, setVideoVisible] = useState(false);
 
@@ -49,7 +51,7 @@ export default function ExerciseVideoPlayerScreen() {
     : [];
 
   const current = sorted[selectedIdx];
-  const thumbUrl = adaloImageUrl(current?.Thumbnail);
+  const videoUrl = adaloVideoUrl(current?.["Video File"]);
 
   const goBack = () => setSelectedIdx(i => Math.max(0, i - 1));
   const goNext = () => setSelectedIdx(i => Math.min(sorted.length - 1, i + 1));
@@ -69,8 +71,7 @@ export default function ExerciseVideoPlayerScreen() {
     }
     toKeep.forEach(url => {
       if (!playersRef.current.has(url)) {
-        const p = createVideoPlayer({ uri: url });
-        p.loop = true;
+        const p = createVideoPlayer(url);
         playersRef.current.set(url, p);
       }
     });
@@ -161,17 +162,17 @@ export default function ExerciseVideoPlayerScreen() {
                   style={[styles.thumbArea, { height: THUMB_H }]}
                   onPress={() => setVideoVisible(true)}
                 >
-                  {thumbUrl ? (
-                    <Image
-                      source={{ uri: thumbUrl }}
-                      style={StyleSheet.absoluteFillObject}
-                      resizeMode="cover"
+                  {videoUrl ? (
+                    <VideoRenderer
+                      uri={videoUrl}
+                      player={currentPlayer}
+                      rendererKey={`inline-${current.id}`}
                     />
                   ) : (
                     <View style={styles.thumbPlaceholder} />
                   )}
                   <View style={styles.playOverlay}>
-                    <Feather name="play" size={22} color="#fff" />
+                    <Feather name="maximize" size={22} color="#fff" />
                   </View>
                 </Pressable>
 
@@ -197,7 +198,7 @@ export default function ExerciseVideoPlayerScreen() {
 
       {/* Bottom bar */}
       {!isLoading && sorted.length > 0 && (
-        <View style={styles.bottomBar}>
+        <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
           <Pressable style={styles.closeBtn} onPress={() => router.back()}>
             <Text style={styles.closeBtnText}>CLOSE</Text>
           </Pressable>
@@ -282,9 +283,11 @@ const styles = StyleSheet.create({
   },
   playOverlay: {
     position: "absolute",
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    top: 10,
+    right: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: "rgba(0,0,0,0.55)",
     alignItems: "center",
     justifyContent: "center",

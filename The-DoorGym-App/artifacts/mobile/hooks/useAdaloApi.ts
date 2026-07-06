@@ -94,6 +94,7 @@ export interface AdaloVideo {
   "Education Categories": number[];
   Thumbnail: AdaloImage;
   "Video File": AdaloImage;
+  "YouTube Link"?: string;
   VideoFile: string;
   Description: string;
   BodyPart: string;

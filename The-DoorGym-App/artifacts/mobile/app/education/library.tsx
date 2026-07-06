@@ -66,18 +66,7 @@ export default function EducationLibraryScreen() {
   function handleItemPress(item: AdaloEducationItem) {
     const isOverview = item.Name?.toLowerCase().startsWith("overview");
     if (isOverview) {
-      const catIds = item["Education Categories"] ?? [];
-      // For Overview, first try matching workoutType, then fall back to any category
-      const matchingCat =
-        allCategories?.find(cat => catIds.includes(cat.id) && cat["Library Type"] === workoutType) ??
-        allCategories?.find(cat => catIds.includes(cat.id));
-      if (matchingCat) {
-        router.push(
-          `/education/videos/${matchingCat.id}?name=${encodeURIComponent(item.Name)}` as never
-        );
-        return;
-      }
-      // No categories at all — play single video from the item directly
+      // Skip intermediate screen — go directly to video player
       router.push(`/education/${item.id}?autoplay=1` as never);
       return;
     }

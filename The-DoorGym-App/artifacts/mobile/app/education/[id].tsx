@@ -27,7 +27,7 @@ export default function EducationDetailScreen() {
   const router = useRouter();
   const { width: SCREEN_W } = useWindowDimensions();
   const [menuVisible, setMenuVisible] = useState(false);
-  const [videoVisible, setVideoVisible] = useState(false);
+  const [videoVisible, setVideoVisible] = useState(autoplay === "1");
   const { workoutType } = useWorkoutType();
 
   const itemId = parseInt(id ?? "0", 10);
@@ -56,6 +56,22 @@ export default function EducationDetailScreen() {
         `/education/videos/${myCategories[0].id}?name=${encodeURIComponent(item?.Name ?? "")}` as never
       );
     }
+  }
+
+  if (autoplay === "1") {
+    if (!videoUrl) {
+      return (
+        <View style={{ flex: 1, backgroundColor: "#000000", alignItems: "center", justifyContent: "center", gap: 16 }}>
+          <ActivityIndicator size="large" color="#47B3DD" />
+          <Text style={{ color: "#ffffff", fontSize: 15, fontFamily: "Inter_400Regular" }}>
+            Fetching video...
+          </Text>
+        </View>
+      );
+    }
+    return (
+      <VideoPlayerModal visible={true} videoUrl={videoUrl} onClose={() => router.back()} />
+    );
   }
 
   return (
@@ -126,17 +142,19 @@ export default function EducationDetailScreen() {
         </View>
       )}
 
-      <VideoPlayerModal
-        visible={videoVisible}
-        videoUrl={videoUrl}
-        onClose={() => {
-          if (autoplay === "1") {
-            router.back();
-          } else {
-            setVideoVisible(false);
-          }
-        }}
-      />
+      {(videoUrl || !autoplay) && (
+        <VideoPlayerModal
+          visible={videoVisible}
+          videoUrl={videoUrl}
+          onClose={() => {
+            if (autoplay === "1") {
+              router.back();
+            } else {
+              setVideoVisible(false);
+            }
+          }}
+        />
+      )}
 
       <DrawerMenu visible={menuVisible} onClose={() => setMenuVisible(false)} />
     </SafeAreaView>

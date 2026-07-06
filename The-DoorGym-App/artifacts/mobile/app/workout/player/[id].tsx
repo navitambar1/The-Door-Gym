@@ -176,10 +176,10 @@ export default function WorkoutPlayerScreen() {
           <Text style={styles.loadingText}>Loading workout...</Text>
         </View>
       )}
-      
+
       {!isLoading && (
         <>
-          {/* Video area */}
+          {/* Video fills entire screen */}
           <View style={styles.videoArea}>
             {videoUrl ? (
               <VideoRenderer
@@ -195,47 +195,46 @@ export default function WorkoutPlayerScreen() {
             )}
           </View>
 
-          {/* Timer */}
-          <View style={styles.timerRow}>
+          {/* Timer — overlaid above center */}
+          <View style={styles.timerRow} pointerEvents="none">
             <Timer resetKey={timerKey} />
           </View>
 
-          {/* EXIT top-right */}
+          {/* EXIT — top-right circle */}
           <Pressable style={styles.exitBtn} onPress={() => router.back()}>
-            <Text style={styles.exitBtnText}>EXIT</Text>
+            <Text style={styles.circleText}>EXIT</Text>
           </Pressable>
 
-          {/* Bottom nav */}
-          <View style={styles.controls}>
-            <Pressable
-              style={[styles.navBtn, idx === 0 && phase === "regular" && styles.navBtnDisabled]}
-              onPress={goBack}
-            >
-              <Feather name="chevron-left" size={22} color="#ffffff" />
-              <Text style={styles.navBtnText}>BACK</Text>
-            </Pressable>
+          {/* BACK — bottom-left circle */}
+          <Pressable
+            style={[styles.backBtn, idx === 0 && phase === "regular" && styles.navBtnDisabled]}
+            onPress={goBack}
+          >
+            <Text style={styles.circleText}>BACK</Text>
+          </Pressable>
 
-            <Pressable style={styles.exitLargeBtn} onPress={() => router.back()}>
-              <Text style={styles.exitLargeText}>EXIT</Text>
-            </Pressable>
-
-            <Pressable style={styles.navBtn} onPress={goNext}>
-              <Text style={styles.navBtnText}>NEXT</Text>
-              <Feather name="chevron-right" size={22} color="#ffffff" />
-            </Pressable>
-          </View>
+          {/* NEXT — bottom-right circle */}
+          <Pressable style={styles.nextBtn} onPress={goNext}>
+            <Text style={styles.circleText}>NEXT</Text>
+          </Pressable>
         </>
       )}
     </View>
   );
 }
 
+const CIRCLE = 64;
+const TOP_OFFSET = Platform.OS === "ios" ? 56 : 36;
+const BOTTOM_OFFSET = Platform.OS === "ios" ? 44 : 28;
+
 const styles = StyleSheet.create({
   fullscreen: { flex: 1, backgroundColor: "#000000" },
   center: { flex: 1, alignItems: "center", justifyContent: "center", gap: 12 },
   loadingText: { color: "rgba(255,255,255,0.7)", fontFamily: "Inter_400Regular" },
 
-  videoArea: { flex: 1, backgroundColor: "#111", position: "relative" },
+  // Video fills the whole screen
+  videoArea: { ...StyleSheet.absoluteFillObject, backgroundColor: "#000" },
+
   noVideoPlaceholder: {
     flex: 1,
     alignItems: "center",
@@ -247,61 +246,73 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: "Inter_400Regular",
   },
+
+  // Timer floats above center of screen
   timerRow: {
-    backgroundColor: "#000",
+    position: "absolute",
+    top: TOP_OFFSET,
+    alignSelf: "center",
+    left: 0,
+    right: 0,
     alignItems: "center",
-    paddingVertical: 8,
   },
   timer: {
-    color: "#ffffff",
-    fontSize: 20,
+    color: "#000000",
+    fontSize: 28,
     fontFamily: "Inter_600SemiBold",
-    letterSpacing: 3,
+    letterSpacing: 4,
   },
 
-  exitBtn: {
+  // Shared circle style
+  circle: {
     position: "absolute",
-    top: Platform.OS === "ios" ? 52 : 32,
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: CIRCLE,
+    height: CIRCLE,
+    borderRadius: CIRCLE / 2,
     backgroundColor: COLORS.primary,
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 10,
   },
-  exitBtnText: {
-    color: "#fff",
+  circleText: {
+    color: "#ffffff",
     fontSize: 11,
     fontFamily: "Inter_700Bold",
     letterSpacing: 1,
   },
 
-  controls: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 24,
-    paddingVertical: Platform.OS === "ios" ? 20 : 16,
-    backgroundColor: "#000000",
-  },
-  navBtn: {
-    flexDirection: "row",
-    alignItems: "center",
+  exitBtn: {
+    position: "absolute",
+    top: TOP_OFFSET,
+    right: 20,
+    width: CIRCLE,
+    height: CIRCLE,
+    borderRadius: CIRCLE / 2,
     backgroundColor: COLORS.primary,
-    borderRadius: 30,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    gap: 4,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
+  },
+  backBtn: {
+    position: "absolute",
+    bottom: BOTTOM_OFFSET,
+    left: 20,
+    width: CIRCLE,
+    height: CIRCLE,
+    borderRadius: CIRCLE / 2,
+    backgroundColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  nextBtn: {
+    position: "absolute",
+    bottom: BOTTOM_OFFSET,
+    right: 20,
+    width: CIRCLE,
+    height: CIRCLE,
+    borderRadius: CIRCLE / 2,
+    backgroundColor: COLORS.primary,
+    alignItems: "center",
+    justifyContent: "center",
   },
   navBtnDisabled: { opacity: 0.35 },
-  navBtnText: { color: "#ffffff", fontSize: 13, fontFamily: "Inter_700Bold", letterSpacing: 1 },
-  exitLargeBtn: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 30,
-    paddingHorizontal: 28,
-    paddingVertical: 12,
-  },
-  exitLargeText: { color: "#ffffff", fontSize: 13, fontFamily: "Inter_700Bold", letterSpacing: 1.5 },
 });

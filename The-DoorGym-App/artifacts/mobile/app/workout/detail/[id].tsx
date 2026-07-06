@@ -43,20 +43,20 @@ export default function WorkoutDetailScreen() {
 
       {!isLoading && workout && (
         <ScrollView contentContainerStyle={styles.content}>
-          {/* Hero */}
+          {/* Hero
           <View style={styles.hero}>
             {heroImageUrl ? (
               <Image
-                source={{ uri: heroImageUrl }}
-                style={StyleSheet.absoluteFillObject}
-                resizeMode="contain"
-              />
+              source={{ uri: heroImageUrl }}
+              style={StyleSheet.absoluteFillObject}
+              resizeMode="contain"
+            />
             ) : (
               <View style={styles.heroIconFallback}>
                 <Feather name="zap" size={44} color="#ffffff" />
               </View>
             )}
-          </View>
+          </View> */}
 
           {/* Name */}
           <View style={styles.section}>
@@ -113,11 +113,9 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: "center", justifyContent: "center", gap: 12 },
   content: { paddingBottom: 60 },
   hero: {
-    aspectRatio: 16 / 9,
-    backgroundColor: COLORS.primaryDark,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
+    width: "100%",
+    backgroundColor: "#ffffff",
+    overflow: "visible",
   },
   heroIconFallback: {
     width: 80,

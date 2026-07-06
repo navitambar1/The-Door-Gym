@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "24ef246d-fd50-4793-9183-e0ce7b4ab1d1"
+      }
+    },
+    "android": {
+      "package": "com.thedoorgym.gym"
+    }
+  }
+}

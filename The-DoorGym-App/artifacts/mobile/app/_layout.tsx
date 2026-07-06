@@ -10,6 +10,7 @@ import { setBaseUrl } from "@workspace/api-client-react";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
+import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -19,7 +20,9 @@ import { WorkoutTypeProvider } from "@/context/WorkoutTypeContext";
 
 setBaseUrl(`https://${process.env.EXPO_PUBLIC_DOMAIN}`);
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {
+  /* ignore error */
+});
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 60_000 } },
@@ -55,13 +58,11 @@ export default function RootLayout() {
     Inter_700Bold,
   });
 
-  useEffect(() => {
-    if (fontsLoaded || fontError) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded, fontError]);
+  // Splash screen is handled in app/index.tsx to prevent flickering
+  // by waiting for the React component to mount and the image to load.
 
-  if (!fontsLoaded && !fontError) return null;
+  // if (!fontsLoaded && !fontError) return null;
+  if (!fontsLoaded && !fontError) return <View style={{ flex: 1, backgroundColor: "#ffffff" }} />
 
   return (
     <SafeAreaProvider>
