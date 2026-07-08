@@ -153,5 +153,5 @@ export function VideoRenderer(props: VideoRendererProps) {
 }
 
 const styles = StyleSheet.create({
-  video: { flex: 1, backgroundColor: "#000" },
+  video: { width: "100%", height: "100%", backgroundColor: "#000" },
 });

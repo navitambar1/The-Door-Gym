@@ -18,7 +18,9 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { WorkoutTypeProvider } from "@/context/WorkoutTypeContext";
 
-setBaseUrl(`https://${process.env.EXPO_PUBLIC_DOMAIN}`);
+const domain = process.env.EXPO_PUBLIC_DOMAIN;
+const protocol = domain?.includes("ngrok") || domain?.includes(".app") ? "https" : "http";
+setBaseUrl(`${protocol}://${domain}`);
 
 SplashScreen.preventAutoHideAsync().catch(() => {
   /* ignore error */
