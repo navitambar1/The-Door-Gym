@@ -18,7 +18,9 @@ function getYouTubeVideoId(url: string): string | null {
 }
 
 function buildEmbedHtml(videoId: string): string {
-  const src = `https://www.youtube.com/embed/${videoId}?controls=0&autoplay=1&mute=0&loop=1&playlist=${videoId}&rel=0&playsinline=1&modestbranding=1&iv_load_policy=3&enablejsapi=1&origin=https://localhost`;
+  // mute=1 is required for autoplay on iOS/Android WebViews (YouTube policy).
+  // controls=1 lets users tap to unmute.
+  const src = `https://www.youtube.com/embed/${videoId}?controls=1&autoplay=1&mute=1&loop=1&playlist=${videoId}&rel=0&playsinline=1&modestbranding=1&iv_load_policy=3&enablejsapi=1&origin=https://localhost`;
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -72,34 +74,54 @@ function YouTubeRenderer({ uri, rendererKey }: Pick<VideoRendererProps, "uri" | 
 }
 
 function NativeRenderer({ uri, player: externalPlayer, rendererKey, onLoad, onLoadStart, onError }: VideoRendererProps) {
-  // IMPORTANT: never pass null/undefined to useVideoPlayer — the native VideoPlayer
-  // constructor crashes when given null. Always supply the real URI so the native
-  // object is created safely. No setup callback: all playback is driven by effects.
+  // IMPORTANT: never pass null/undefined to useVideoPlayer — crashes natively.
+  // useVideoPlayer(uri) already starts loading the video in the background.
+  // Do NOT call replaceAsync with the same uri — it restarts loading and causes
+  // a black frame on mobile until the async completes (the "nav-away-and-back" bug).
   const ownPlayer = useVideoPlayer(uri, undefined);
 
-  // The VideoView shows whichever player is active.
   const activePlayer = externalPlayer ?? ownPlayer;
 
-  // Own-player path: load + play via replaceAsync (off main-thread on iOS).
-  // Fires on initial mount and whenever URI or rendererKey changes.
+  // Own-player path: video is already loading via useVideoPlayer(uri).
+  // Wait for readyToPlay, then start looped playback.
   useEffect(() => {
     if (externalPlayer || !uri) return;
-    ownPlayer.replaceAsync({ uri })
-      .then(() => {
-        ownPlayer.loop = true;
-        ownPlayer.play();
-      })
-      .catch(() => { /* ignore aborted replacements */ });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uri, rendererKey]);
 
-  // External-player path: set loop and start playing as soon as the player arrives.
+    const play = () => {
+      try { ownPlayer.loop = true; ownPlayer.play(); } catch { /* ignore */ }
+    };
+
+    if ((ownPlayer as any).status === "readyToPlay") {
+      play();
+      return;
+    }
+
+    const sub = ownPlayer.addListener("statusChange", (event) => {
+      if (event.status === "readyToPlay") play();
+    });
+    return () => sub.remove();
+  // rendererKey in deps ensures this re-runs when the component remounts for a new video
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uri, rendererKey, externalPlayer]);
+
+  // External-player path: wait for readyToPlay before starting, so we never
+  // get a black frame when the preloaded player hasn't finished buffering yet.
   useEffect(() => {
     if (!externalPlayer) return;
-    try {
-      externalPlayer.loop = true;
-      externalPlayer.play();
-    } catch { /* ignore */ }
+
+    const play = () => {
+      try { externalPlayer.loop = true; externalPlayer.play(); } catch { /* ignore */ }
+    };
+
+    if ((externalPlayer as any).status === "readyToPlay") {
+      play();
+      return;
+    }
+
+    const sub = externalPlayer.addListener("statusChange", (event) => {
+      if (event.status === "readyToPlay") play();
+    });
+    return () => sub.remove();
   }, [externalPlayer]);
 
   // Forward status events to optional callbacks.
