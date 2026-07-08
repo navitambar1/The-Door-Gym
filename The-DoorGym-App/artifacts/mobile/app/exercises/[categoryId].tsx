@@ -33,10 +33,7 @@ function getNativeVideoUrl(v: AdaloVideo | undefined): string | null {
   return url && !isYouTubeUrl(url) ? url : null;
 }
 
-/**
- * Prefer YouTube link (plays reliably via WebView on all platforms).
- * Fall back to the native S3 URL only if no YouTube link exists.
- */
+
 function getBestVideoUrl(v: AdaloVideo | undefined): string | null {
   if (!v) return null;
   const yt = v["YouTube Link"];
@@ -62,8 +59,7 @@ export default function ExerciseVideoPlayerScreen() {
     : [];
 
   const current = sorted[selectedIdx];
-  // Prefer YouTube URL — works reliably on mobile via WebView.
-  // Only fall back to native S3 URL if no YouTube link is available.
+
   const videoUrl = getBestVideoUrl(current);
 
   const goBack = () => setSelectedIdx(i => Math.max(0, i - 1));
@@ -106,12 +102,11 @@ export default function ExerciseVideoPlayerScreen() {
   }, []);
 
   const currentNativeUrl = getNativeVideoUrl(current);
-  // Only use the preloaded native player when the best URL is also a native (non-YouTube) URL
   const currentPlayer = (currentNativeUrl && videoUrl === currentNativeUrl)
     ? (playersRef.current.get(currentNativeUrl) ?? null)
     : null;
 
-  // Scroll sidebar to show the active item after the modal closes
+
   function scrollSidebarToSelected(idx: number) {
     setTimeout(() => {
       sidebarRef.current?.scrollToIndex({
@@ -186,7 +181,6 @@ export default function ExerciseVideoPlayerScreen() {
                   ) : (
                     <View style={styles.thumbPlaceholder} />
                   )}
-                  {/* Invisible overlay to capture taps and prevent the WebView from swallowing them */}
                   <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'transparent' }]} />
                 </Pressable>
 
