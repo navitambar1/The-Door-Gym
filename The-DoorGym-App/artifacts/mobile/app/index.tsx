@@ -31,6 +31,7 @@ export default function CustomSplashScreen() {
       clearTimeout(hideTimer);
       clearTimeout(navigationTimer);
     };
+
   }, [isContextLoading, workoutType, hasSeenIntro, hasSeenMedical, router]);
 
   return (
