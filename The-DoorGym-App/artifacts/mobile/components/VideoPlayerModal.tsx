@@ -4,23 +4,24 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Modal,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { VideoRenderer } from "@/components/VideoRenderer";
 import { COLORS } from "@/constants/colors";
 
 const CIRCLE = 64;
-const TOP_OFFSET = Platform.OS === "ios" ? 56 : 36;
+// small breathing room beyond the safe-area edge — NOT a big inward push
+const EDGE_GAP = 12;
 
 interface VideoPlayerModalProps {
   visible: boolean;
   videoUrl: string | null | undefined;
-  /** Pre-loaded native VideoPlayer — skips buffering delay on play */
   player?: VideoPlayer | null;
   onClose: () => void;
   onBack?: () => void;
@@ -40,7 +41,9 @@ export function VideoPlayerModal({
   nextDisabled,
 }: VideoPlayerModalProps) {
   const [loading, setLoading] = useState(false);
-
+  const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
   useEffect(() => {
     if (!loading) return;
     const t = setTimeout(() => setLoading(false), 12000);
@@ -55,6 +58,19 @@ export function VideoPlayerModal({
       ScreenOrientation.unlockAsync().catch(() => {});
     }
   }, [visible]);
+
+  // Positions derived from the ACTUAL safe area, so they hold up
+  // across portrait, landscape-left, landscape-right, notches, etc.
+  const topPos = insets.top + (isLandscape ? 20 : 12);
+
+  const bottomPos =
+    insets.bottom + (isLandscape ? 10 : 10);
+
+  const leftPos =
+    insets.left + (isLandscape ? 10 : 10);
+
+  const rightPos =
+    insets.right + (isLandscape ? 43 : 10);
 
   return (
     <Modal
@@ -86,14 +102,21 @@ export function VideoPlayerModal({
         )}
 
         {/* EXIT — top-right */}
-        <Pressable style={[styles.circle, styles.exitBtn]} onPress={onClose}>
+        <Pressable
+          style={[styles.circle, { top: topPos, right: rightPos }]}
+          onPress={onClose}
+        >
           <Text style={styles.circleText}>EXIT</Text>
         </Pressable>
 
         {/* BACK — bottom-left */}
         {onBack && (
           <Pressable
-            style={[styles.circle, styles.backBtn, backDisabled && styles.disabled]}
+            style={[
+              styles.circle,
+              { bottom: bottomPos, left: leftPos },
+              backDisabled && styles.disabled,
+            ]}
             onPress={onBack}
           >
             <Text style={styles.circleText}>BACK</Text>
@@ -103,7 +126,11 @@ export function VideoPlayerModal({
         {/* NEXT — bottom-right */}
         {onNext && (
           <Pressable
-            style={[styles.circle, styles.nextBtn, nextDisabled && styles.disabled]}
+            style={[
+              styles.circle,
+              { bottom: bottomPos, right: rightPos },
+              nextDisabled && styles.disabled,
+            ]}
             onPress={onNext}
           >
             <Text style={styles.circleText}>NEXT</Text>
@@ -113,8 +140,6 @@ export function VideoPlayerModal({
     </Modal>
   );
 }
-
-const BOTTOM_OFFSET = Platform.OS === "ios" ? 44 : 28;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#000" },
@@ -149,8 +174,5 @@ const styles = StyleSheet.create({
     fontFamily: "Inter_700Bold",
     letterSpacing: 1,
   },
-  exitBtn: { top: TOP_OFFSET, right: 20 },
-  backBtn: { bottom: BOTTOM_OFFSET, left: 20 },
-  nextBtn: { bottom: BOTTOM_OFFSET, right: 20 },
   disabled: { opacity: 0.35 },
 });

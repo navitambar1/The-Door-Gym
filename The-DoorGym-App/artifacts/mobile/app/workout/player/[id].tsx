@@ -5,12 +5,14 @@ import { createVideoPlayer, type VideoPlayer } from "expo-video";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
+
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAdaloWorkout, AdaloVideo, adaloVideoUrl } from "@/hooks/useAdaloApi";
 import { useWorkoutType } from "@/context/WorkoutTypeContext";
 import { VideoRenderer } from "@/components/VideoRenderer";
@@ -47,6 +49,9 @@ function Timer({ resetKey }: { resetKey: number }) {
 export default function WorkoutPlayerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
   const { currentPackage } = useWorkoutType();
   const workoutId = parseInt(id ?? "0", 10);
 
@@ -169,6 +174,17 @@ export default function WorkoutPlayerScreen() {
 
   const isLoading = workoutLoading || !isReady;
   const videoUrl = adaloVideoUrl(currentVideo?.["Video File"]) ?? null;
+  
+  const topPos = insets.top + (isLandscape ? 10 : EDGE_GAP);
+
+  const bottomPos =
+    insets.bottom + (isLandscape ? 10 : EDGE_GAP);
+
+  const leftPos =
+    insets.left + (isLandscape ? 10 : EDGE_GAP);
+
+  const rightPos =
+    insets.right + (isLandscape ? 30 : EDGE_GAP);
 
   return (
     <View style={styles.fullscreen}>
@@ -198,25 +214,59 @@ export default function WorkoutPlayerScreen() {
           </View>
 
           {/* Timer — overlaid above center */}
-          <View style={styles.timerRow} pointerEvents="none">
+          <View
+            pointerEvents="none"
+            style={[
+              styles.timerRow,
+              {
+                top: topPos,
+              },
+            ]}
+          >
             <Timer resetKey={timerKey} />
           </View>
 
           {/* EXIT — top-right circle */}
-          <Pressable style={styles.exitBtn} onPress={() => router.back()}>
+          <Pressable
+            style={[
+              styles.circle,
+              {
+                top: topPos,
+                right: rightPos,
+                zIndex: 10,
+              },
+            ]}
+            onPress={() => router.back()}
+          >
             <Text style={styles.circleText}>EXIT</Text>
           </Pressable>
 
           {/* BACK — bottom-left circle */}
           <Pressable
-            style={[styles.backBtn, idx === 0 && phase === "regular" && styles.navBtnDisabled]}
+            style={[
+              styles.circle,
+              {
+                bottom: bottomPos,
+                left: leftPos,
+              },
+              idx === 0 && phase === "regular" && styles.navBtnDisabled,
+            ]}
             onPress={goBack}
           >
             <Text style={styles.circleText}>BACK</Text>
           </Pressable>
 
           {/* NEXT — bottom-right circle */}
-          <Pressable style={styles.nextBtn} onPress={goNext}>
+          <Pressable
+            style={[
+              styles.circle,
+              {
+                bottom: bottomPos,
+                right: rightPos,
+              },
+            ]}
+            onPress={goNext}
+          >
             <Text style={styles.circleText}>NEXT</Text>
           </Pressable>
         </>
@@ -226,8 +276,7 @@ export default function WorkoutPlayerScreen() {
 }
 
 const CIRCLE = 64;
-const TOP_OFFSET = Platform.OS === "ios" ? 56 : 36;
-const BOTTOM_OFFSET = Platform.OS === "ios" ? 44 : 28;
+const EDGE_GAP = 20;
 
 const styles = StyleSheet.create({
   fullscreen: { flex: 1, backgroundColor: "#000000" },
@@ -252,7 +301,6 @@ const styles = StyleSheet.create({
   // Timer floats above center of screen
   timerRow: {
     position: "absolute",
-    top: TOP_OFFSET,
     alignSelf: "center",
     left: 0,
     right: 0,
@@ -282,39 +330,39 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
 
-  exitBtn: {
-    position: "absolute",
-    top: TOP_OFFSET,
-    right: 20,
-    width: CIRCLE,
-    height: CIRCLE,
-    borderRadius: CIRCLE / 2,
-    backgroundColor: COLORS.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 10,
-  },
-  backBtn: {
-    position: "absolute",
-    bottom: BOTTOM_OFFSET,
-    left: 20,
-    width: CIRCLE,
-    height: CIRCLE,
-    borderRadius: CIRCLE / 2,
-    backgroundColor: COLORS.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  nextBtn: {
-    position: "absolute",
-    bottom: BOTTOM_OFFSET,
-    right: 20,
-    width: CIRCLE,
-    height: CIRCLE,
-    borderRadius: CIRCLE / 2,
-    backgroundColor: COLORS.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  // exitBtn: {
+  //   position: "absolute",
+  //   top: TOP_OFFSET,
+  //   right: 20,
+  //   width: CIRCLE,
+  //   height: CIRCLE,
+  //   borderRadius: CIRCLE / 2,
+  //   backgroundColor: COLORS.primary,
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  //   zIndex: 10,
+  // },
+  // backBtn: {
+  //   position: "absolute",
+  //   bottom: BOTTOM_OFFSET,
+  //   left: 20,
+  //   width: CIRCLE,
+  //   height: CIRCLE,
+  //   borderRadius: CIRCLE / 2,
+  //   backgroundColor: COLORS.primary,
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  // },
+  // nextBtn: {
+  //   position: "absolute",
+  //   bottom: BOTTOM_OFFSET,
+  //   right: 20,
+  //   width: CIRCLE,
+  //   height: CIRCLE,
+  //   borderRadius: CIRCLE / 2,
+  //   backgroundColor: COLORS.primary,
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  // },
   navBtnDisabled: { opacity: 0.35 },
 });
