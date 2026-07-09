@@ -72,7 +72,9 @@ export default function WorkoutPlayerScreen() {
     const videoIds = [...(workout.Videos ?? []), ...(workout["Circuit Videos"] ?? [])];
     if (videoIds.length === 0) { setIsReady(true); return; }
 
-    const base = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api/adalo`;
+    const domain = process.env.EXPO_PUBLIC_DOMAIN;
+    const protocol = domain?.includes("ngrok") || domain?.includes(".app") ? "https" : "http";
+    const base = `${protocol}://${domain}/api/adalo`;
     const idList = videoIds.join(",");
     fetch(`${base}/videos?ids=${idList}`)
       .then(r => r.json())

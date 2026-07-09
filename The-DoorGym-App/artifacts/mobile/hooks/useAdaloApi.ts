@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 
-const BASE_URL = `https://${process.env.EXPO_PUBLIC_DOMAIN}/api/adalo`;
+const domain = process.env.EXPO_PUBLIC_DOMAIN;
+const protocol = domain?.includes("ngrok") || domain?.includes(".app") ? "https" : "http";
+const BASE_URL = `${protocol}://${domain}/api/adalo`;
 
 async function adaloFetch<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`);

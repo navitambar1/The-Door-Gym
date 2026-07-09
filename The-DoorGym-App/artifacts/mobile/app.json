@@ -70,10 +70,16 @@
       "reactCompiler": true
     },
     "extra": {
-      "eas": {
+      "//_old_eas": {
         "projectId": "b7aa7a44-b70d-45b8-933b-32833bd2ba4e"
+      },
+      "router": {
+        "origin": "https://replit.com/"
+      },
+      "eas": {
+        "projectId": "b1b808e0-169e-4571-a8b7-b3227d430596"
       }
     },
-    "owner": "navneet-dev"
+    "//_old_owner": "navneet-dev"
   }
 }

@@ -33,6 +33,14 @@ function getNativeVideoUrl(v: AdaloVideo | undefined): string | null {
   return url && !isYouTubeUrl(url) ? url : null;
 }
 
+
+function getBestVideoUrl(v: AdaloVideo | undefined): string | null {
+  if (!v) return null;
+  const yt = v["YouTube Link"];
+  if (yt && yt.trim().length > 0) return yt.trim();
+  return adaloVideoUrl(v["Video File"]);
+}
+
 export default function ExerciseVideoPlayerScreen() {
   const { categoryId, name } = useLocalSearchParams<{ categoryId: string; name?: string }>();
   const router = useRouter();
@@ -51,7 +59,8 @@ export default function ExerciseVideoPlayerScreen() {
     : [];
 
   const current = sorted[selectedIdx];
-  const videoUrl = adaloVideoUrl(current?.["Video File"]);
+
+  const videoUrl = getBestVideoUrl(current);
 
   const goBack = () => setSelectedIdx(i => Math.max(0, i - 1));
   const goNext = () => setSelectedIdx(i => Math.min(sorted.length - 1, i + 1));
@@ -93,9 +102,11 @@ export default function ExerciseVideoPlayerScreen() {
   }, []);
 
   const currentNativeUrl = getNativeVideoUrl(current);
-  const currentPlayer = currentNativeUrl ? (playersRef.current.get(currentNativeUrl) ?? null) : null;
+  const currentPlayer = (currentNativeUrl && videoUrl === currentNativeUrl)
+    ? (playersRef.current.get(currentNativeUrl) ?? null)
+    : null;
 
-  // Scroll sidebar to show the active item after the modal closes
+
   function scrollSidebarToSelected(idx: number) {
     setTimeout(() => {
       sidebarRef.current?.scrollToIndex({
@@ -165,15 +176,12 @@ export default function ExerciseVideoPlayerScreen() {
                   {videoUrl ? (
                     <VideoRenderer
                       uri={videoUrl}
-                      player={currentPlayer}
                       rendererKey={`inline-${current.id}`}
                     />
                   ) : (
                     <View style={styles.thumbPlaceholder} />
                   )}
-                  <View style={styles.playOverlay}>
-                    <Feather name="maximize" size={22} color="#fff" />
-                  </View>
+                  <View style={[StyleSheet.absoluteFillObject, { backgroundColor: 'transparent' }]} />
                 </Pressable>
 
                 <FlatList
@@ -210,7 +218,7 @@ export default function ExerciseVideoPlayerScreen() {
 
       <VideoPlayerModal
         visible={videoVisible}
-        videoUrl={adaloVideoUrl(current?.["Video File"]) ?? null}
+        videoUrl={getBestVideoUrl(current) ?? null}
         player={currentPlayer}
         onClose={() => {
           setVideoVisible(false);
@@ -280,17 +288,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     backgroundColor: COLORS.primaryDark,
-  },
-  playOverlay: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "rgba(0,0,0,0.55)",
-    alignItems: "center",
-    justifyContent: "center",
   },
   infoScroll: { flex: 1 },
   infoContent: { padding: 14, paddingBottom: 28 },
